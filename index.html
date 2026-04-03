@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENGIMO GWA</title>
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        /* =========================================
+           GLOBAL VARIABLES (Apple HIG Inspired)
+           ========================================= */
+        :root {
+            /* Light Mode Default */
+            --bg-primary: #F5F5F7;
+            --bg-secondary: #FFFFFF;
+            --bg-sidebar: rgba(245, 245, 247, 0.8);
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --accent-blue: #0071E3;
+            --accent-blue-hover: #0077ED;
+            --accent-red: #FF3B30;
+            --border-color: rgba(60, 60, 67, 0.12);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --sidebar-width: 80px;
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #000000;
+                --bg-secondary: #1C1C1E;
+                --bg-sidebar: rgba(28, 28, 30, 0.8);
+                --text-primary: #F5F5F7;
+                --text-secondary: #86868B;
+                --accent-blue: #0A84FF;
+                --accent-blue-hover: #0071E3;
+                --accent-red: #FF453A;
+                --border-color: rgba(84, 84, 88, 0.65);
+                --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+                --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            font-family: var(--font-family);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* View toggles */
+        .view-section { 
+            display: none; 
+            width: 100%; 
+            height: 100vh; 
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .view-section.active { 
+            display: flex; 
+            opacity: 1;
+        }
+
+        /* =========================================
+           PHASE 1: LOADING SCREEN STYLES
+           ========================================= */
+        #view-loading {
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background-color: var(--bg-primary);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--text-secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .loading-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: -0.02em;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* =========================================
+           PHASE 2: AUTH SCREEN STYLES
+           ========================================= */
+        #view-auth {
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-box {
+            background: var(--bg-secondary);
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 360px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .auth-icon {
+            font-size: 48px;
+            color: var(--accent-blue);
+            margin-bottom: 24px;
+        }
+
+        .auth-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .auth-subtitle {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.4;
+            margin-bottom: 32px;
+        }
+
+        .auth-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .auth-btn:hover {
+            background: var(--accent-blue-hover);
+        }
+
+        .auth-btn:active {
+            transform: scale(0.98);
+        }
+
+        .auth-msg {
+            margin-top: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            min-height: 20px;
+            color: var(--text-secondary);
+        }
+
+        /* =========================================
+           PHASE 3: MAIN APP STYLES
+           ========================================= */
+        #view-main { 
+            flex-direction: row; 
+        }
+
+        .sidebar {
+            position: fixed; 
+            left: 0; 
+            top: 0; 
+            width: var(--sidebar-width); 
+            height: 100vh;
+            background: var(--bg-sidebar);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-color);
+            padding: 20px 0; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            gap: 12px; 
+            overflow-y: auto; 
+            z-index: 1000;
+        }
+
+        .sidebar::-webkit-scrollbar { display: none; }
+        .sidebar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .sidebar-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-btn:hover {
+            background: var(--bg-primary);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-btn:active {
+            transform: scale(0.92);
+            background: var(--border-color);
+        }
+
+        .sidebar-btn.active {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        .main-content { 
+            margin-left: var(--sidebar-width);
+            flex: 1; 
+            padding: 60px 5%;
+            width: calc(100% - var(--sidebar-width));
+            overflow-y: auto;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .main-content h1 {
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 40px;
+            color: var(--text-primary);
+        }
+
+        .letter-section {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .letter-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .buttons-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 12px;
+        }
+
+        /* CUSTOM APP BUTTON DESIGN (Side-by-Side Grid Style) */
+        .content-btn {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 14px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-btn::after {
+            content: '\f061'; /* FontAwesome right arrow */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 12px;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.2s ease;
+            color: var(--accent-blue);
+        }
+
+        .content-btn:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .content-btn:hover::after {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .content-btn:active {
+            transform: scale(0.97);
+        }
+
+        .empty-message {
+            color: var(--text-secondary);
+            font-size: 15px;
+            text-align: center;
+            padding: 20px;
+            grid-column: 1 / -1;
+            font-style: italic;
+        }
+
+        #user-button-area {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding-bottom: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================
+         PHASE 1: LOADING ANIMATION
+         ========================================== -->
+    <div id="view-loading" class="view-section active">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading ENGIMO...</div>
+    </div>
+
+
+    <!-- ==========================================
+         PHASE 2: AUTHENTICATION PROMPT
+         ========================================== -->
+    <div id="view-auth" class="view-section">
+        <div class="auth-box">
+            <i class="fa-solid fa-user-circle auth-icon"></i>
+            <div class="auth-title">Sign In</div>
+            <p class="auth-subtitle">
+                Please connect your trusted ENGIMO ID to proceed securely.
+            </p>
+            
+            <button class="auth-btn" onclick="triggerClerkLogin()">Continue to Login</button>
+            <div class="auth-msg" id="auth-msg"></div>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
+         PHASE 3: MAIN APP UI
+         ========================================== -->
+    <div id="view-main" class="view-section">
+        <div class="sidebar" id="sidebar">
+            <div id="user-button-area"></div>
+            <!-- Dynamic sidebar buttons go here -->
+        </div>
+
+        <div class="main-content">
+            <h1 id="main-title">ENGIMO Workspace</h1>
+            <div id="sections-container">
+                <!-- Dynamically populated content will go here -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
+         JAVASCRIPT LOGIC
+         ========================================== -->
+    <script>
+        const CLERK_FRONTEND_API = "clerk.engimo.org";
+        const CLERK_SIGN_IN_URL = "https://accounts.engimo.org/sign-in";
+
+        let minimumLoadingFinished = false;
+        let clerkReady = false;
+
+        const clerkScript = document.createElement('script');
+        clerkScript.setAttribute('data-clerk-frontend-api', CLERK_FRONTEND_API);
+        clerkScript.async = true;
+        clerkScript.crossOrigin = 'anonymous';
+        clerkScript.src = `https://${CLERK_FRONTEND_API}/npm/@clerk/clerk-js@latest/dist/clerk.browser.js`;
+        clerkScript.onload = async () => {
+            await window.Clerk.load();
+            clerkReady = true;
+            checkAuthAndTransition();
+        };
+        document.head.appendChild(clerkScript);
+
+        window.onload = () => {
+            setTimeout(() => {
+                minimumLoadingFinished = true;
+                checkAuthAndTransition();
+            }, 1500);
+        };
+
+        function checkAuthAndTransition() {
+            if (!minimumLoadingFinished || !clerkReady) return;
+
+            if (window.Clerk.user) {
+                mountUserButton();
+                loadPayload();
+                switchView('view-main');
+            } else {
+                switchView('view-auth');
+            }
+        }
+
+        function loadPayload() {
+            const script = document.createElement('script');
+            script.src = 'https://static.engimo.org/js/gwa/gwa_payload.js';
+            document.body.appendChild(script);
+        }
+
+        function triggerClerkLogin() {
+            const msgBox = document.getElementById('auth-msg');
+            msgBox.innerText = "Redirecting securely...";
+            window.Clerk.redirectToSignIn({ 
+                signInUrl: CLERK_SIGN_IN_URL 
+            });
+        }
+
+        function mountUserButton() {
+            const container = document.getElementById('user-button-area');
+            window.Clerk.mountUserButton(container);
+        }
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            setTimeout(() => {
+                document.getElementById(viewId).classList.add('active');
+            }, 50);
+        }
+    </script>
+</body>
+</html>
