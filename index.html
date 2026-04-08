@@ -85,7 +85,7 @@
             <p class="auth-subtitle">
                 Security protocols require a verified email address to access the Global Workspace. Your account profile is currently incomplete.
             </p>
-            <subtitle>Note: SPS emails are not supported as ENGIMO cannot send to them.</subtitle>
+            
             <button class="auth-btn" style="background: linear-gradient(to bottom, #ffc84d 0%, #ff9900 100%); border-color: #cc7a00;" onclick="window.Clerk.openUserProfile()">Verify Account Settings</button>
             
             <p style="margin-top: 15px; font-size: 11px; color: #777;">
@@ -160,9 +160,8 @@
                 }
 
                 // Passed all checks! Grant access to GWA.
-
                 const firstName = user.firstName || "Client";
-                document.getElementById('main-title').innerText = "Hello, " + firstName + ". Welcome to the ENGIMO Global Workspace.";
+                document.getElementById('main-title').innerText = "Hello, " + firstName;
                 
                 mountUserButton();
                 loadPayload();
