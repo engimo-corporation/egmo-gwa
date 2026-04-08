@@ -75,6 +75,25 @@
         </div>
     </div>
 
+    <!-- ==========================================
+         PHASE 5: INCOMPLETE ACCOUNT (EMAIL VERIFICATION)
+         ========================================== -->
+    <div id="view-incomplete" class="view-section">
+        <div class="auth-box" style="border-color: #ff9900; background: linear-gradient(to bottom, #ffffff 0%, #fffbf0 100%);">
+            <i class="fa-solid fa-envelope-circle-check auth-icon" style="color: #ff9900;"></i>
+            <div class="auth-title" style="color: #cc7a00;">Verification Required</div>
+            <p class="auth-subtitle">
+                Security protocols require a verified email address to access the Global Workspace. Your account profile is currently incomplete.
+            </p>
+            
+            <button class="auth-btn" style="background: linear-gradient(to bottom, #ffc84d 0%, #ff9900 100%); border-color: #cc7a00;" onclick="window.Clerk.openUserProfile()">Verify Account Settings</button>
+            
+            <p style="margin-top: 15px; font-size: 11px; color: #777;">
+                Once verified, <a href="#" onclick="location.reload()" style="color: #1e5799;">refresh this page</a> to continue.
+            </p>
+        </div>
+    </div>
+
 
     <!-- ==========================================
          JAVASCRIPT LOGIC
@@ -94,6 +113,14 @@
         clerkScript.onload = async () => {
             await window.Clerk.load();
             clerkReady = true;
+            
+            // Add listener to auto-refresh state if they verify while the page is open
+            window.Clerk.addListener(({ user }) => {
+                if (minimumLoadingFinished && clerkReady) {
+                    checkAuthAndTransition();
+                }
+            });
+
             checkAuthAndTransition();
         };
         document.head.appendChild(clerkScript);
@@ -108,18 +135,31 @@
         function checkAuthAndTransition() {
             if (!minimumLoadingFinished || !clerkReady) return;
 
-            if (window.Clerk.user) {
-                // Check if user is natively flagged by Clerk as locked or banned
-                // (Note: Clerk usually destroys the session entirely, but this acts as an immediate fallback)
-                const isLocked = window.Clerk.user.locked || window.Clerk.user.banned;
-                
+            const user = window.Clerk.user;
+
+            if (user) {
+                // Check 1: Is the user administratively locked or banned?
+                const isLocked = user.locked || user.banned;
                 if (isLocked) {
-                    // Sign them out of the current session silently and show the locked screen
                     window.Clerk.signOut();
                     switchView('view-locked');
                     return;
                 }
 
+                // Check 2: Does the user have a verified email address?
+                let hasVerifiedEmail = false;
+                if (user.primaryEmailAddress && user.primaryEmailAddress.verification.status === 'verified') {
+                    hasVerifiedEmail = true;
+                } else if (user.emailAddresses && user.emailAddresses.length > 0) {
+                    hasVerifiedEmail = user.emailAddresses.some(email => email.verification.status === 'verified');
+                }
+
+                if (!hasVerifiedEmail) {
+                    switchView('view-incomplete');
+                    return;
+                }
+
+                // Passed all checks! Grant access to GWA.
                 mountUserButton();
                 loadPayload();
                 switchView('view-main');
@@ -128,10 +168,13 @@
             }
         }
 
+        let payloadLoaded = false;
         function loadPayload() {
+            if (payloadLoaded) return; // Prevent double-loading if event listener fires multiple times
             const script = document.createElement('script');
             script.src = 'https://static.engimo.org/js/gwa/gwa_payload.js';
             document.body.appendChild(script);
+            payloadLoaded = true;
         }
 
         function triggerClerkLogin() {
@@ -144,7 +187,9 @@
 
         function mountUserButton() {
             const container = document.getElementById('user-button-area');
-            window.Clerk.mountUserButton(container);
+            if (container && !container.hasChildNodes()) {
+                window.Clerk.mountUserButton(container);
+            }
         }
 
         function switchView(viewId) {
