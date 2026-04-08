@@ -61,6 +61,22 @@
 
 
     <!-- ==========================================
+         PHASE 4: LOCKED / UNAUTHORIZED ACCOUNT
+         ========================================== -->
+    <div id="view-locked" class="view-section">
+        <div class="auth-box" style="border-color: #d9534f; background: linear-gradient(to bottom, #ffffff 0%, #fff0f0 100%);">
+            <i class="fa-solid fa-user-lock auth-icon" style="color: #d9534f;"></i>
+            <div class="auth-title" style="color: #d9534f;">Access Revoked</div>
+            <p class="auth-subtitle">
+                Your ENGIMO ID has been locked by an administrator. Access to the Global Workspace is currently suspended.
+            </p>
+            
+            <button class="auth-btn" style="background: linear-gradient(to bottom, #777, #555); border-color: #333; text-shadow: none;" onclick="window.location.href='https://www.engimo.org/support.html'">Contact Support</button>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
          JAVASCRIPT LOGIC
          ========================================== -->
     <script>
@@ -93,6 +109,17 @@
             if (!minimumLoadingFinished || !clerkReady) return;
 
             if (window.Clerk.user) {
+                // Check if user is natively flagged by Clerk as locked or banned
+                // (Note: Clerk usually destroys the session entirely, but this acts as an immediate fallback)
+                const isLocked = window.Clerk.user.locked || window.Clerk.user.banned;
+                
+                if (isLocked) {
+                    // Sign them out of the current session silently and show the locked screen
+                    window.Clerk.signOut();
+                    switchView('view-locked');
+                    return;
+                }
+
                 mountUserButton();
                 loadPayload();
                 switchView('view-main');
