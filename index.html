@@ -3,62 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ENGIMO GWA</title>
+    <title>ENGIMO GWA Workspace</title>
     
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
         /* =========================================
-           GLOBAL VARIABLES (Apple HIG Inspired)
+           GLOBAL VARIABLES & RESET (Web 2.0 Era)
            ========================================= */
-        :root {
-            /* Light Mode Default */
-            --bg-primary: #F5F5F7;
-            --bg-secondary: #FFFFFF;
-            --bg-sidebar: rgba(245, 245, 247, 0.8);
-            --text-primary: #1D1D1F;
-            --text-secondary: #86868B;
-            --accent-blue: #0071E3;
-            --accent-blue-hover: #0077ED;
-            --accent-red: #FF3B30;
-            --border-color: rgba(60, 60, 67, 0.12);
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
-            --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --radius-lg: 18px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-            --sidebar-width: 80px;
-        }
-
-        /* Dark Mode Support */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-primary: #000000;
-                --bg-secondary: #1C1C1E;
-                --bg-sidebar: rgba(28, 28, 30, 0.8);
-                --text-primary: #F5F5F7;
-                --text-secondary: #86868B;
-                --accent-blue: #0A84FF;
-                --accent-blue-hover: #0071E3;
-                --accent-red: #FF453A;
-                --border-color: rgba(84, 84, 88, 0.65);
-                --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-                --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.4);
-            }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            margin: 0;
-            padding: 0;
             height: 100vh;
             overflow: hidden;
-            font-family: var(--font-family);
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            font-family: "Lucida Grande", "Lucida Sans Unicode", Tahoma, Arial, sans-serif;
+            background-color: #dce6f2;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255,255,255,0.4) 4px, rgba(255,255,255,0.4) 8px);
+            color: #333;
+            font-size: 13px;
+        }
+
+        a {
+            color: #005bb5;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
         }
 
         /* View toggles */
@@ -66,12 +41,9 @@
             display: none; 
             width: 100%; 
             height: 100vh; 
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
         }
         .view-section.active { 
             display: flex; 
-            opacity: 1;
         }
 
         /* =========================================
@@ -81,29 +53,48 @@
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            background-color: var(--bg-primary);
         }
 
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--border-color);
-            border-top: 3px solid var(--text-secondary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+        .loading-container {
+            background: #ffffff;
+            border: 1px solid #b5c4d6;
+            border-radius: 6px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 350px;
         }
 
         .loading-text {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            letter-spacing: -0.02em;
+            font-family: "Trebuchet MS", sans-serif;
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e5799;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 0px #fff;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* Classic Fake Progress Bar */
+        .progress-bar-wrap {
+            width: 100%;
+            height: 22px;
+            background: #eef3f9;
+            border: 1px solid #a3b8cc;
+            padding: 2px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(to bottom, #7cb7f2 0%, #4b98e6 50%, #1e5799 51%, #0b3e7a 100%);
+            width: 0%;
+            animation: fakeLoad 1.5s linear forwards;
+        }
+
+        @keyframes fakeLoad {
+            0% { width: 5%; }
+            50% { width: 60%; }
+            100% { width: 100%; }
         }
 
         /* =========================================
@@ -115,63 +106,74 @@
         }
 
         .auth-box {
-            background: var(--bg-secondary);
-            padding: 48px 40px;
+            background: linear-gradient(to bottom, #ffffff 0%, #eef3f9 100%);
+            padding: 40px;
             width: 100%;
-            max-width: 360px;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md);
+            max-width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             text-align: center;
-            border: 1px solid var(--border-color);
+            border: 1px solid #b5c4d6;
         }
 
         .auth-icon {
-            font-size: 48px;
-            color: var(--accent-blue);
-            margin-bottom: 24px;
+            font-size: 52px;
+            color: #1e5799;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .auth-title {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            letter-spacing: -0.02em;
+            font-family: "Trebuchet MS", "Arial Black", sans-serif;
+            font-size: 26px;
+            font-weight: bold;
+            color: #1e5799;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+            text-shadow: 1px 1px 0px #fff;
         }
 
         .auth-subtitle {
-            color: var(--text-secondary);
-            font-size: 15px;
-            line-height: 1.4;
-            margin-bottom: 32px;
+            color: #555;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            border-bottom: 1px dotted #ccc;
+            padding-bottom: 20px;
         }
 
+        /* Glossy Orange Button */
         .auth-btn {
-            background: var(--accent-blue);
-            color: white;
-            border: none;
-            padding: 14px 24px;
-            font-size: 15px;
-            font-weight: 600;
-            border-radius: var(--radius-md);
+            display: inline-block;
+            background: linear-gradient(to bottom, #ffc84d 0%, #ff9900 50%, #e66e00 51%, #cc5200 100%);
+            border: 1px solid #993d00;
+            border-radius: 20px;
+            padding: 12px 30px;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            font-size: 16px;
+            text-shadow: 0 -1px 0 rgba(0,0,0,0.4);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 2px 4px rgba(0,0,0,0.3);
             cursor: pointer;
             width: 100%;
-            transition: background-color 0.2s ease, transform 0.1s ease;
         }
 
         .auth-btn:hover {
-            background: var(--accent-blue-hover);
+            background: linear-gradient(to bottom, #ffd673 0%, #ffaa22 50%, #f07b00 51%, #e05e00 100%);
         }
 
         .auth-btn:active {
-            transform: scale(0.98);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+            background: linear-gradient(to bottom, #cc5200 0%, #e66e00 50%, #ff9900 51%, #ffc84d 100%);
         }
 
         .auth-msg {
-            margin-top: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            min-height: 20px;
-            color: var(--text-secondary);
+            margin-top: 15px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #d9534f;
+            min-height: 15px;
         }
 
         /* =========================================
@@ -179,175 +181,167 @@
            ========================================= */
         #view-main { 
             flex-direction: row; 
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="20"/></svg>') no-repeat right top #2b2b2b;
         }
 
         .sidebar {
             position: fixed; 
             left: 0; 
             top: 0; 
-            width: var(--sidebar-width); 
+            width: 80px; 
             height: 100vh;
-            background: var(--bg-sidebar);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-right: 1px solid var(--border-color);
-            padding: 20px 0; 
+            background: linear-gradient(to right, #eef3f9 0%, #dce6f2 100%);
+            border-right: 1px solid #a3b8cc;
+            box-shadow: inset -1px 0 0 #fff, 2px 0 5px rgba(0,0,0,0.1);
+            padding: 15px 0; 
             display: flex; 
             flex-direction: column;
             align-items: center;
-            gap: 12px; 
+            gap: 10px; 
             overflow-y: auto; 
             z-index: 1000;
         }
 
-        .sidebar::-webkit-scrollbar { display: none; }
-        .sidebar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Custom Scrollbar for the vintage feel */
+        .sidebar::-webkit-scrollbar { width: 8px; }
+        .sidebar::-webkit-scrollbar-track { background: #dce6f2; border-left: 1px solid #b5c4d6; }
+        .sidebar::-webkit-scrollbar-thumb { background: #a3b8cc; border-radius: 4px; }
 
         .sidebar-btn {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            font-weight: 600;
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+            background: linear-gradient(to bottom, #ffffff 0%, #f4f7f9 100%);
+            border: 1px solid #b5c4d6;
+            color: #1e5799;
+            font-family: "Trebuchet MS", sans-serif;
+            font-size: 18px;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--shadow-sm);
+            box-shadow: inset 0 1px 0 #fff, 0 1px 2px rgba(0,0,0,0.05);
+            text-shadow: 1px 1px 0px #fff;
         }
 
         .sidebar-btn:hover {
-            background: var(--bg-primary);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar-btn:active {
-            transform: scale(0.92);
-            background: var(--border-color);
+            background: linear-gradient(to bottom, #ffffff 0%, #e0eaf3 100%);
+            border-color: #7cb7f2;
         }
 
         .sidebar-btn.active {
-            background: var(--accent-blue);
+            background: linear-gradient(to bottom, #4b98e6 0%, #1e5799 100%);
             color: white;
-            border-color: var(--accent-blue);
+            border-color: #133a66;
+            text-shadow: 0 -1px 0 rgba(0,0,0,0.5);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
         }
 
         .main-content { 
-            margin-left: var(--sidebar-width);
+            margin-left: 80px;
             flex: 1; 
-            padding: 60px 5%;
-            width: calc(100% - var(--sidebar-width));
+            padding: 30px;
+            width: calc(100% - 80px);
             overflow-y: auto;
             height: 100vh;
-            box-sizing: border-box;
+            background: #ffffff; /* White workspace area */
+            box-shadow: inset 5px 0 10px rgba(0,0,0,0.05);
         }
 
         .main-content h1 {
-            font-size: 34px;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 40px;
-            color: var(--text-primary);
+            font-family: "Trebuchet MS", "Arial Black", sans-serif;
+            font-size: 32px;
+            font-weight: bold;
+            color: #1e5799;
+            letter-spacing: -1px;
+            text-shadow: 1px 1px 0px #fff, 2px 2px 3px rgba(0,0,0,0.15);
+            border-bottom: 4px solid #ff9900;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
         }
 
+        /* Content Blocks */
         .letter-section {
-            background: var(--bg-secondary);
-            border-radius: var(--radius-lg);
-            padding: 32px;
-            margin-bottom: 32px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-            width: 100%;
-            box-sizing: border-box;
+            background: linear-gradient(to bottom, #fefefe, #f4f7f9);
+            border: 1px solid #cdd8e4;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05), inset 0 1px 0 #fff;
         }
 
         .letter-header {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 24px;
-            color: var(--text-primary);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            font-family: "Trebuchet MS", sans-serif;
+            font-size: 22px;
+            font-weight: bold;
+            color: #1e5799;
+            border-bottom: 1px dotted #a3b8cc;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            background: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/svgs/solid/folder-open.svg') no-repeat left center;
+            background-size: 20px;
+            padding-left: 28px;
         }
 
         .buttons-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
         }
 
-        /* CUSTOM APP BUTTON DESIGN (Side-by-Side Grid Style) */
+        /* Custom App Buttons (Web 2.0 Style) */
         .content-btn {
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            padding: 14px 18px;
-            font-size: 14px;
-            font-weight: 600;
-            border-radius: var(--radius-md);
+            background: linear-gradient(to bottom, #ffffff 0%, #eef3f9 100%);
+            border: 1px solid #b5c4d6;
+            color: #333;
+            padding: 12px 15px;
+            font-size: 13px;
+            font-weight: bold;
+            font-family: Tahoma, Arial, sans-serif;
+            border-radius: 4px;
             cursor: pointer;
-            width: 100%;
             text-align: left;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             position: relative;
-            overflow: hidden;
+            box-shadow: inset 0 1px 0 #fff, 0 1px 2px rgba(0,0,0,0.05);
         }
 
         .content-btn::after {
-            content: '\f061'; /* FontAwesome right arrow */
-            font-family: "Font Awesome 6 Free";
-            font-weight: 900;
-            font-size: 12px;
-            opacity: 0;
-            transform: translateX(-10px);
-            transition: all 0.2s ease;
-            color: var(--accent-blue);
+            content: '»';
+            position: absolute;
+            right: 15px;
+            color: #ff9900;
+            font-size: 16px;
+            font-weight: bold;
         }
 
         .content-btn:hover {
-            background: var(--bg-secondary);
-            border-color: var(--accent-blue);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .content-btn:hover::after {
-            opacity: 1;
-            transform: translateX(0);
+            background: linear-gradient(to bottom, #ffffff 0%, #dce6f2 100%);
+            border-color: #7cb7f2;
+            color: #1e5799;
         }
 
         .content-btn:active {
-            transform: scale(0.97);
+            background: #dce6f2;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            border-color: #a3b8cc;
         }
 
         .empty-message {
-            color: var(--text-secondary);
-            font-size: 15px;
-            text-align: center;
-            padding: 20px;
-            grid-column: 1 / -1;
+            color: #777;
+            font-size: 12px;
             font-style: italic;
+            padding: 10px;
+            background: #fff;
+            border: 1px dashed #ccc;
+            text-align: center;
         }
 
         #user-button-area {
             width: 100%;
             display: flex;
             justify-content: center;
-            padding-bottom: 20px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 5px;
+            border-bottom: 1px solid #b5c4d6;
+            box-shadow: 0 1px 0 #fff;
         }
     </style>
 </head>
@@ -357,8 +351,13 @@
          PHASE 1: LOADING ANIMATION
          ========================================== -->
     <div id="view-loading" class="view-section active">
-        <div class="spinner"></div>
-        <div class="loading-text">Loading ENGIMO...</div>
+        <div class="loading-container">
+            <div class="loading-text">Initializing ENGIMO...</div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill"></div>
+            </div>
+            <div style="margin-top: 10px; font-size: 11px; color: #666;">Contacting secure authentication servers...</div>
+        </div>
     </div>
 
 
@@ -367,13 +366,13 @@
          ========================================== -->
     <div id="view-auth" class="view-section">
         <div class="auth-box">
-            <i class="fa-solid fa-user-circle auth-icon"></i>
-            <div class="auth-title">Sign In</div>
+            <i class="fa-solid fa-lock auth-icon"></i>
+            <div class="auth-title">Client Login</div>
             <p class="auth-subtitle">
-                Please connect your trusted ENGIMO ID to proceed securely.
+                Please connect your trusted ENGIMO ID to access the Global Workspace securely.
             </p>
             
-            <button class="auth-btn" onclick="triggerClerkLogin()">Continue to Login</button>
+            <button class="auth-btn" onclick="triggerClerkLogin()">Secure Login →</button>
             <div class="auth-msg" id="auth-msg"></div>
         </div>
     </div>
@@ -389,7 +388,7 @@
         </div>
 
         <div class="main-content">
-            <h1 id="main-title">ENGIMO Workspace</h1>
+            <h1 id="main-title">ENGIMO Global Workspace</h1>
             <div id="sections-container">
                 <!-- Dynamically populated content will go here -->
             </div>
@@ -423,7 +422,7 @@
             setTimeout(() => {
                 minimumLoadingFinished = true;
                 checkAuthAndTransition();
-            }, 1500);
+            }, 1500); // 1.5s matches the fake loading bar CSS animation
         };
 
         function checkAuthAndTransition() {
@@ -446,7 +445,7 @@
 
         function triggerClerkLogin() {
             const msgBox = document.getElementById('auth-msg');
-            msgBox.innerText = "Redirecting securely...";
+            msgBox.innerText = "Redirecting over secure connection...";
             window.Clerk.redirectToSignIn({ 
                 signInUrl: CLERK_SIGN_IN_URL 
             });
@@ -459,9 +458,7 @@
 
         function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            setTimeout(() => {
-                document.getElementById(viewId).classList.add('active');
-            }, 50);
+            document.getElementById(viewId).classList.add('active');
         }
     </script>
 </body>
